@@ -1,6 +1,12 @@
 # IntelliJ folder
 .idea/
 
+# /target folder
+target/
+
+# jenv files
+.java-version
+
 # Compiled class file
 *.class
 

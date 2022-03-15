@@ -1,1 +1,11 @@
+spring:
+  task.scheduling.pool.size: 1  # We can increase this number if we add more independent schedulers
 
+wakanda:
+  cron:
+    expression: "0 0 2 * * ?"  # Every day at 02:00
+    zone: "UTC"
+
+client:
+  payout:
+    uri: "http://intrum.mocklab.io/payout"
