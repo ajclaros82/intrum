@@ -1,4 +1,4 @@
-package com.ajclaros.payouts.client.payout;
+package com.ajclaros.payoutsapp.client.payout;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
