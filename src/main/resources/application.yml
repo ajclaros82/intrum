@@ -5,6 +5,9 @@ wakanda:
   cron:
     expression: "0 0 2 * * ?"  # Every day at 02:00
     zone: "UTC"
+  file:
+    path: "src/main/resources/wakanda/"
+    starts-with: "WK_payouts_"
 
 client:
   payout:

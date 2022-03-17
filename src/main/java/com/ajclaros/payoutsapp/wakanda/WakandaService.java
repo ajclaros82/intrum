@@ -2,13 +2,16 @@ package com.ajclaros.payoutsapp.wakanda;
 
 import com.ajclaros.payoutsapp.client.payout.PayoutClient;
 import com.ajclaros.payoutsapp.client.payout.PayoutDtoMapper;
+import com.ajclaros.payoutsapp.file.PathFinder;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.Objects;
 import java.util.stream.Stream;
 
@@ -16,23 +19,26 @@ import java.util.stream.Stream;
 @Service
 public class WakandaService {
 
-    private static final String FILE_PATH = "src/main/resources/wakanda/";
-    private static final String FILE_NAME = "wakanda-payouts.txt";
-
-    private final PayoutClient payoutClient;
     private final WakandaPayoutMapper wakandaPayoutMapper;
     private final PayoutDtoMapper payoutDtoMapper;
+    private final PayoutClient payoutClient;
+    private final String filePath;
+    private final String fileStartsWith;
 
-    public WakandaService(PayoutClient payoutClient, WakandaPayoutMapper wakandaPayoutMapper, PayoutDtoMapper payoutDtoMapper) {
-        this.payoutClient = payoutClient;
+    public WakandaService(WakandaPayoutMapper wakandaPayoutMapper, PayoutDtoMapper payoutDtoMapper, PayoutClient payoutClient,
+                          @Value("${wakanda.file.path}") String filePath, @Value("${wakanda.file.starts-with}") String fileStartsWith) {
         this.wakandaPayoutMapper = wakandaPayoutMapper;
         this.payoutDtoMapper = payoutDtoMapper;
+        this.payoutClient = payoutClient;
+        this.filePath = filePath;
+        this.fileStartsWith = fileStartsWith;
     }
 
     @Scheduled(cron = "${wakanda.cron.expression}", zone = "${wakanda.cron.zone}")
     public void payout() {
         log.info("Executing payouts for Wakanda...");
-        try (Stream<String> stream = Files.lines(Paths.get(FILE_PATH + FILE_NAME))) {
+
+        try (Stream<String> stream = Files.lines(getPath())) {
             stream.skip(1)
                     .map(wakandaPayoutMapper::map)
                     .filter(Objects::nonNull)
@@ -57,6 +63,13 @@ public class WakandaService {
             return;
         }
         log.info("Execution finished!");
+    }
+
+    @SneakyThrows
+    private Path getPath() {
+        // String yesterday = now().minusDays(1).format(DateTimeFormatter.BASIC_ISO_DATE);
+        String yesterday = "20220317";
+        return PathFinder.getPath(filePath, fileStartsWith + yesterday);
     }
 
 }
