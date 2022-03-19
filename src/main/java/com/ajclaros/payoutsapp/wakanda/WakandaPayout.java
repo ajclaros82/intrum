@@ -14,5 +14,5 @@ public class WakandaPayout {
     String companyTaxNumber;
     WakandaPayoutStatusEnum status;
     LocalDate paymentDate;
-    Double amount;
+    double amount;
 }

@@ -3,11 +3,13 @@ package com.ajclaros.payoutsapp.wakanda;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.ajclaros.payoutsapp.formatter.DoubleFormatter.commaSeparatedFormat;
+import static java.util.Objects.isNull;
 
 @Slf4j
 @Component
@@ -20,22 +22,19 @@ public class WakandaPayoutMapper {
     private static final int PAYMENT_DATE_POS = 4;
     private static final int AMOUNT_POS = 5;
 
-    public WakandaPayout map(String str) {
-        Matcher matcher = WAKANDA_PATTERN.matcher(str);
-        if (!matcher.matches()) return null;
+    public WakandaPayout map(String str) throws IllegalArgumentException, ParseException {
+        if (isNull(str)) throw new IllegalArgumentException("Input should not be null.");
 
-        try {
-            return WakandaPayout.builder()
-                    .companyName(matcher.group(COMPANY_NAME_POS))
-                    .companyTaxNumber(matcher.group(COMPANY_TAX_NUMBER_POS))
-                    .status(WakandaPayoutStatusEnum.valueOf(matcher.group(STATUS_POS)))
-                    .paymentDate(LocalDate.parse(matcher.group(PAYMENT_DATE_POS)))
-                    .amount(commaSeparatedFormat(matcher.group(AMOUNT_POS)))
-                    .build();
-        } catch (Exception e) {
-            log.warn("Could not map to wakanda payout: {}", str, e);
-            return null;
-        }
+        Matcher matcher = WAKANDA_PATTERN.matcher(str);
+        if (!matcher.matches()) throw new IllegalArgumentException("Line does not match the expected pattern.");
+
+        return WakandaPayout.builder()
+                .companyName(matcher.group(COMPANY_NAME_POS))
+                .companyTaxNumber(matcher.group(COMPANY_TAX_NUMBER_POS))
+                .status(WakandaPayoutStatusEnum.valueOf(matcher.group(STATUS_POS)))
+                .paymentDate(LocalDate.parse(matcher.group(PAYMENT_DATE_POS)))
+                .amount(commaSeparatedFormat(matcher.group(AMOUNT_POS)))
+                .build();
     }
 
 }

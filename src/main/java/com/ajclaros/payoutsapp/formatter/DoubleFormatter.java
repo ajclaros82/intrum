@@ -1,14 +1,16 @@
 package com.ajclaros.payoutsapp.formatter;
 
-import lombok.SneakyThrows;
-
 import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.Locale;
+
+import static java.util.Objects.isNull;
 
 public class DoubleFormatter {
 
-    @SneakyThrows
-    static public double commaSeparatedFormat(String doubleStr) {
+    static public double commaSeparatedFormat(String doubleStr) throws ParseException {
+        if (isNull(doubleStr)) throw new IllegalArgumentException("Input should not be null.");
+
         return NumberFormat.getInstance(Locale.FRANCE).parse(doubleStr).doubleValue();
     }
 

@@ -9,6 +9,8 @@ import static java.util.Objects.isNull;
 public class PathFinder {
 
     public static Path getPath(String filePath, String startsWith) throws FileNotFoundException {
+        if (isNull(filePath) || isNull(startsWith)) throw new IllegalArgumentException("Inputs should not be null.");
+
         File[] foundFiles = new File(filePath).listFiles((dir, name) -> name.startsWith(startsWith));
 
         if (isNull(foundFiles) || foundFiles.length == 0)
