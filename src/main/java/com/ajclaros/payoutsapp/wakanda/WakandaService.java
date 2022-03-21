@@ -39,7 +39,7 @@ public class WakandaService {
     }
 
     @Scheduled(cron = "${wakanda.cron.expression}", zone = "${wakanda.cron.zone}")
-    public void payout() {
+    public void executePayouts() {
         log.info("Executing payouts for Wakanda...");
 
         try (Stream<String> stream = Files.lines(getPath())) {
@@ -60,17 +60,19 @@ public class WakandaService {
     private Path getPath() {
         // String yesterday = now().minusDays(1).format(DateTimeFormatter.BASIC_ISO_DATE);
         String yesterday = "20220317";
-        return PathFinder.getPath(filePath, fileStartsWith + yesterday);
+        Path path = PathFinder.getPath(filePath, fileStartsWith + yesterday);
+        log.info("Found file on {}", path);
+        return path;
     }
 
     private Function<String, WakandaPayout> toWakandaPayout() {
         return str -> {
             try {
                 WakandaPayout wakandaPayout = wakandaPayoutMapper.map(str);
-                log.info("Received payout {} from wakanda file mapping to dto.", wakandaPayout);
+                log.info("Received payout {} from file.", wakandaPayout);
                 return wakandaPayout;
             } catch (Exception e) {
-                log.warn("Could not map to wakanda payout {}", str, e);
+                log.warn("Could not map to wakanda payout {}.", str, e);
                 return null;
             }
         };
@@ -78,19 +80,24 @@ public class WakandaService {
 
     private Function<WakandaPayout, PayoutDto> toPayoutDto() {
         return payout -> {
-            log.info("Received payout {} from wakanda file mapping to dto.", payout);
-            return payoutDtoMapper.map(payout);
+            PayoutDto dto = payoutDtoMapper.map(payout);
+            log.info("Mapped payout to dto {}.", dto);
+            return dto;
         };
     }
 
     private Consumer<PayoutDto> sendToExternalPayoutApiForProcessing() {
         return dto -> {
             log.info("Sending dto {} to external api for processing.", dto);
-            ResponseEntity<String> response = payoutClient.postPayout(dto);
-            if (!response.getStatusCode().isError()) {
-                log.info("External processing succeeded: {}", response.getStatusCode());
-            } else {
-                log.warn("External processing failed: {}", response.getStatusCode());
+            try {
+                ResponseEntity<String> response = payoutClient.postPayout(dto);
+                if (!response.getStatusCode().isError()) {
+                    log.info("External processing succeeded: {}", response.getStatusCode());
+                } else {
+                    log.warn("External processing failed: {}", response.getStatusCode());
+                }
+            } catch (Exception e) {
+                log.warn("External processing failed: {}", e.getMessage(), e);
             }
         };
     }

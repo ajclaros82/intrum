@@ -15,7 +15,7 @@ public class PayoutsController {
     }
 
     @GetMapping("/test")
-    public void getTestData() {
+    public void testPayouts() {
         payoutsService.executePayouts();
     }
 

@@ -13,6 +13,6 @@ public class PayoutsService {
     }
 
     public void executePayouts() {
-        wakandaService.payout();
+        wakandaService.executePayouts();
     }
 }

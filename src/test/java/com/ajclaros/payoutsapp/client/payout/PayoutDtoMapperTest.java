@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class PayoutDtoMapperTest {
 
-    PayoutDtoMapper mapper = new PayoutDtoMapper();
+    private final PayoutDtoMapper mapper = new PayoutDtoMapper();
 
     @Test
     void givenANullWakandaPayoutWhenMappingShouldThrowAnException() {

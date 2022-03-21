@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class WakandaPayoutMapperTest {
 
-    WakandaPayoutMapper mapper = new WakandaPayoutMapper();
+    private final WakandaPayoutMapper mapper = new WakandaPayoutMapper();
 
     @Test
     void givenANullInputStringWhenMappingShouldThrowAnException() {
