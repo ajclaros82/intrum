@@ -1,0 +1,14 @@
+spring:
+  task.scheduling.pool.size: 1  # We can increase this number if we add more independent schedulers
+
+wakanda:
+  cron:
+    expression: "0 0 2 * * ?"  # Every day at 02:00
+    zone: "UTC"
+  file:
+    path: "src/test/resources/wakanda/"
+    starts-with: "WK_payouts_"
+
+client:
+  payout:
+    uri: "http://localhost:8080/external-payout"
